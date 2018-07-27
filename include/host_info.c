@@ -12,48 +12,97 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
+#include <sys/utsname.h>
+#include <ifaddrs.h>
+#include "host_info.h"
 
-//获取地址
-//返回IP地址字符串
-int getlocalip(char *outip) {
-    int i = 0;
-    int sockfd;
-    struct ifconf ifconf;
-    char buf = (char) malloc(512);
-    struct ifreq *ifreq;
-    char *ip;
 
-    //初始化ifconf
-    ifconf.ifc_len = 512;
-    ifconf.ifc_buf = buf;
+LONG current_system_time_millis() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    /**
+     * int ：表示数据范围在-32768到32767之间
+     * long int : 表示的范围在-2147483648到2147483647之间
+     * long long : 表示的范围在-9223372036854775808 到 9223372036854775807之间
+     *
+     * 毫秒有13位超过了long int范围，所需要转为long long类型
+     */
+    LONG time = (LONG)tv.tv_sec;
+    return time * 1000LL + time / 1000LL;
+}
 
-    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        return -1;
+int current_thread_pid() {
+    return getpid();
+}
+
+int current_parent_thread_pid() {
+    return getppid();
+}
+
+char *current_host_name() {
+    static char hostname[64]; //这里要定义为static，因为此定义的为局部变量，执行完会回收
+
+    if (gethostname(hostname, sizeof(hostname)) < 0) {
+        perror("gethostname");
+        exit(1);
     }
-    ioctl(sockfd, SIOCGIFCONF, &ifconf); //获取所有接口信息
-    close(sockfd);
-    //接下来一个一个的获取IP地址
-    ifreq = (struct ifreq *) buf;
-    i = ifconf.ifc_len / sizeof(struct ifreq);
-    char *pos = outip;
-    int count;
-    for (count = 0; (count < 5 && i > 0); i--) {
-        ip = inet_ntoa(((struct sockaddr_in *) &(ifreq->ifr_addr))->sin_addr);
+    return hostname;
+}
 
-        if (strncmp(ip, "127.0.0.1", 3) == 0) //排除127.x.x.x，继续下一个
-        {
-            ifreq++;
-            continue;
-        } else {
-            printf("%s\n", ip);
-            strcpy(pos, ip);
-            int len = strlen(ip);
-            pos = '\t';
-            pos += len + 1;
-            count++;
-            ifreq++;
+long current_host_id() {
+    long hostid;
+    if ((hostid = gethostid()) < 0) {
+        perror("gethostid");
+        exit(1);
+    }
+    return hostid;
+}
+
+struct utsname current_host_info() {
+    struct utsname buf;
+    if (uname(&buf)) {
+        perror("uname");
+        exit(1);
+    }
+    return buf;
+}
+
+char *current_ipv4() {
+    struct ifaddrs *addrs;
+    void *tmpAddrPtr = NULL;
+    //char result[]
+    if (getifaddrs(&addrs)) {
+        perror("getifaddrs");
+        exit(1);
+    }
+    while (addrs != NULL) {
+        if (addrs->ifa_addr->sa_family == AF_INET &&  strcmp(addrs->ifa_name, "lo") != 0) { // check it is IP4 and exclusion loop address
+            // is a valid IP4 Address
+            tmpAddrPtr = &((struct sockaddr_in *)addrs->ifa_addr)->sin_addr;
+            char addressBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+            printf("%s IPv4 Address %s\n", addrs->ifa_name, addressBuffer);
         }
+        addrs = addrs->ifa_next;
     }
-    free(buf);
-    return 0;
+}
+
+char *current_ipv6() {
+    struct ifaddrs *addrs;
+    void *tmpAddrPtr = NULL;
+    if (getifaddrs(&addrs)) {
+        perror("getifaddrs");
+        exit(1);
+    }
+    while (addrs != NULL) {
+        if (addrs->ifa_addr->sa_family == AF_INET6) { // check it is IP6
+            // is a valid IP6 Address
+            tmpAddrPtr = &((struct sockaddr_in *)addrs->ifa_addr)->sin_addr;
+            char addressBuffer[INET6_ADDRSTRLEN];
+            inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
+            printf("%s IPv6 Address %s\n", addrs->ifa_name, addressBuffer);
+        }
+        addrs = addrs->ifa_next;
+    }
 }

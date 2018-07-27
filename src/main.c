@@ -6,58 +6,61 @@
 #include <stdlib.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <ifaddrs.h>
+#include <time.h>
+#include <sys/time.h>
 #include "cJSON.h"
 #include "host_info.h"
 
 int main() {
 
-    /**
-     * getpid():获取当期运行的进程PID
-     * getppid(): 获取父进程的PID
-     */
-    printf("pid = %d, ppid = %x\n", getpid(), getppid());
+    LONG i = current_system_time_millis();
+    printf("currnet system time millis : %lld\n", i);
 
-    /**
-     * gethostname():获取主机名
-     * gethostid(): 获取主机ID
-     */
-    char hostname[128];
-    long hostid;
-    if (gethostname(hostname, strlen(hostname)) < 0) {
-        perror("gethostname");
-        exit(1);
-    }
+    //------
+    int pid = current_thread_pid();
+    printf("current thread pid : %d\n", pid);
+
+    //------
+    int ppid = current_parent_thread_pid();
+    printf("current parent thread pid : %d\n", ppid);
+
+    //------
+    char *hostname = current_host_name();
     printf("hostname = %s\n", hostname);
-    if ((hostid = gethostid()) < 0) {
-        perror("gethostid");
-        exit(1);
-    }
+
+    //------
+    long hostid = current_host_id();
     printf("hostid = %ld\n", hostid);
 
-    /**
-      * 获取系统信息
-      */
-    struct utsname buf;
-    if (uname(&buf)) {
-        perror("uname");
-        exit(1);
-    }
+    //------
+    struct utsname buf = current_host_info();
     printf("sysname:%s\n", buf.sysname);
     printf("nodename:%s\n", buf.nodename);
     printf("release:%s\n", buf.release);
     printf("version:%s\n", buf.version);
     printf("machine:%s\n", buf.machine);
 
-    /**
-     * 获取本机ipv4
-     */
-    struct hostent *hent;
-    char hname[128];
-    gethostname(hname, sizeof(hname));
-    hent = gethostbyname(hname);
-    printf("hostname: %s/naddress list: ", hent->h_name);
-    for(int i = 0; hent->h_addr_list[i]; i++) {
-        printf("%s/t", inet_ntoa(*(struct in_addr*)(hent->h_addr_list[i])));
-    }
+    //------
+    current_ipv4();
 
+    //------
+    char *test[] = {"aaa", "bb", "cc", "ddddd", "eeee", "ffffff"};
+    //二维数组的长度，就是求行的大小
+    int length = sizeof(test) / sizeof(test[0]); //5
+    printf("数组的长度为: %d\n", length);
+
+    /*char *strarray[3];
+    *strarray[0] = "1";
+    *strarray[1] = "2";
+    *strarray[2] = "3";
+
+    int strlen = sizeof(*strarray) / sizeof(char);
+    printf("数组的长度为: %d\n", strlen);*/
+    /*for () {
+
+    }*/
+
+
+    return 0;
 }
