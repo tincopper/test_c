@@ -68,14 +68,16 @@ struct utsname current_host_info() {
     return buf;
 }
 
-char *current_ipv4() {
+char **current_ipv4() {
     struct ifaddrs *addrs;
     void *tmpAddrPtr = NULL;
+    static char *ipv4s[6] = {};
     //char result[]
     if (getifaddrs(&addrs)) {
         perror("getifaddrs");
         exit(1);
     }
+    int i = 0;
     while (addrs != NULL) {
         if (addrs->ifa_addr->sa_family == AF_INET &&  strcmp(addrs->ifa_name, "lo") != 0) { // check it is IP4 and exclusion loop address
             // is a valid IP4 Address
@@ -83,9 +85,11 @@ char *current_ipv4() {
             char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
             printf("%s IPv4 Address %s\n", addrs->ifa_name, addressBuffer);
+            ipv4s[i++] = addressBuffer;
         }
         addrs = addrs->ifa_next;
     }
+    return ipv4s;
 }
 
 char *current_ipv6() {

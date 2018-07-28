@@ -42,7 +42,13 @@ int main() {
     printf("machine:%s\n", buf.machine);
 
     //------
-    current_ipv4();
+    char **currentIpv4 = current_ipv4();
+    int len = sizeof(currentIpv4) / sizeof(currentIpv4[0]);
+    //printf("len : %d\n", len);
+    //printf("本机IP：%s\n", currentIpv4[0]);
+    for (int i = 0; i < len; i++) {
+        printf("本机IP：%s\n", currentIpv4[i]);
+    }
 
     //------
     char *test[] = {"aaa", "bb", "cc", "ddddd", "eeee", "ffffff"};
@@ -50,17 +56,17 @@ int main() {
     int length = sizeof(test) / sizeof(test[0]); //5
     printf("数组的长度为: %d\n", length);
 
-    /*char *strarray[3];
-    *strarray[0] = "1";
-    *strarray[1] = "2";
-    *strarray[2] = "3";
+    static char *strarray[4] = {};
+    strarray[0] = "1";
+    strarray[1] = "2";
+    strarray[2] = "3";
 
-    int strlen = sizeof(*strarray) / sizeof(char);
-    printf("数组的长度为: %d\n", strlen);*/
-    /*for () {
+    int strlen = sizeof(strarray) / sizeof(strarray[0]);
+    printf("数组的长度为: %d\n", strlen);
 
-    }*/
-
+    for (int i = 0; i < strlen; i++) {
+        printf("数组的内容：%d,%s\n", i, strarray[i]);
+    }
 
     return 0;
 }

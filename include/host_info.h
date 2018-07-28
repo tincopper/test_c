@@ -45,7 +45,7 @@ struct utsname current_host_info();
  * 获取当前系统的ipv4地址
  * @return string[]
  */
-char *current_ipv4();
+char **current_ipv4();
 
 /**
  * 获取当前系统的ipv6地址
