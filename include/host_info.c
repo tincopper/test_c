@@ -68,6 +68,13 @@ struct utsname current_host_info() {
     return buf;
 }
 
+char *current_os_name() {
+    static char result[32];
+    struct utsname utsname = current_host_info();
+    strcpy(result, utsname.sysname);
+    return result;
+}
+
 char **current_ipv4() {
     struct ifaddrs *addrs;
     void *tmpAddrPtr = NULL;
@@ -78,13 +85,13 @@ char **current_ipv4() {
         exit(1);
     }
     int i = 0;
-    while (addrs != NULL) {
+    while (addrs != NULL && i < 6) {
         if (addrs->ifa_addr->sa_family == AF_INET &&  strcmp(addrs->ifa_name, "lo") != 0) { // check it is IP4 and exclusion loop address
             // is a valid IP4 Address
             tmpAddrPtr = &((struct sockaddr_in *)addrs->ifa_addr)->sin_addr;
             char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-            printf("%s IPv4 Address %s\n", addrs->ifa_name, addressBuffer);
+            //printf("%s IPv4 Address %s\n", addrs->ifa_name, addressBuffer);
             ipv4s[i++] = addressBuffer;
         }
         addrs = addrs->ifa_next;
@@ -109,4 +116,58 @@ char *current_ipv6() {
         }
         addrs = addrs->ifa_next;
     }
+}
+
+char *current_host_mac() {
+    int sock_mac;
+    struct ifreq ifr_mac; //ifreq net/if.h
+    struct ifaddrs *addrs;
+    char mac_addr[30];
+    void *tmpAddrPtr = NULL;
+
+    sock_mac = socket( AF_INET, SOCK_STREAM, 0 );
+    if ( sock_mac < 0) {
+        perror("socket");
+        return NULL;
+    }
+
+    if (getifaddrs(&addrs)) {
+        perror("getifaddrs");
+        return NULL;
+    }
+
+    while (addrs != NULL) {
+        if (addrs->ifa_addr->sa_family == AF_INET &&  strcmp(addrs->ifa_name, "lo") != 0) { // check it is IP4 and exclusion loop address
+            // is a valid IP4 Address
+            tmpAddrPtr = &((struct sockaddr_in *)addrs->ifa_addr)->sin_addr;
+            char addressBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+            //printf("%s IPv4 Address %s\n", addrs->ifa_name, addressBuffer);
+
+            //get ipv4 net card name
+            memset(&ifr_mac, 0, sizeof(ifr_mac));
+            strncpy(ifr_mac.ifr_name, addrs->ifa_name, sizeof(ifr_mac.ifr_name) - 1);
+            break; //取第一个
+        }
+        addrs = addrs->ifa_next;
+    }
+
+    if ((ioctl(sock_mac, SIOCGIFHWADDR, &ifr_mac)) < 0) {
+        printf("ioctl");
+        return NULL;
+    }
+
+    sprintf(mac_addr,"%02x%02x%02x%02x%02x%02x",
+            (unsigned char)ifr_mac.ifr_hwaddr.sa_data[0],
+            (unsigned char)ifr_mac.ifr_hwaddr.sa_data[1],
+            (unsigned char)ifr_mac.ifr_hwaddr.sa_data[2],
+            (unsigned char)ifr_mac.ifr_hwaddr.sa_data[3],
+            (unsigned char)ifr_mac.ifr_hwaddr.sa_data[4],
+            (unsigned char)ifr_mac.ifr_hwaddr.sa_data[5]);
+
+    static char result[32];
+    strcpy(result, mac_addr);
+    close(sock_mac);
+
+    return result;
 }

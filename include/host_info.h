@@ -42,6 +42,12 @@ long current_host_id();
 struct utsname current_host_info();
 
 /**
+ * 获取当前系统的OS名称
+ * @return
+ */
+char *current_os_name();
+
+/**
  * 获取当前系统的ipv4地址
  * @return string[]
  */
@@ -55,6 +61,6 @@ char *current_ipv6();
 
 /**
  * 获取当前系统的mac地址
- * @return
+ * @return 如果错误返回NULL,否则返回字符串
  */
 char *current_host_mac();

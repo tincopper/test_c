@@ -9,6 +9,6 @@ add_library(${INCLUDE_DIRECTORIES} host_info.h ../include/host_info.c)
 add_executable(test_c
         ../include/host_info.c
         ../include/cJSON.c
-        main.c)
+        main.c ../include/id_generator_util.c ../include/id_generator_util.h)
 # m: lm
 target_link_libraries(test_c -lm)
