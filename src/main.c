@@ -195,7 +195,40 @@ int main() {
 
     char *uuid[] = {};
     rand64hex(uuid);
-    printf("%s", uuid[0]);
+    printf("%s\n", uuid[0]);
+    
+    // -------
+    char *s1 = "123456";
+    char *s2 = "xx";
+    char *re = strstr(s1, s2);
 
+    int ii = 123;
+    //char *str_i = (char *)ii;
+    char str_i[64];
+    //sscanf(&ii, "%s", str_i);
+    sprintf(str_i, "%d", ii);
+    printf("------> str_i: %s\n", str_i);
+
+    // ---------
+    char *url = "http:\/\/www.baidu.com";
+    char host[64];
+    sscanf(url, "http://%s", host);
+    printf("-----> host: %s", host);
+
+    // ------
+    int num = 123;
+    char *str01 = "xxx";
+    char *str02 = "yyy";
+    char res[64];
+    sprintf(res, "%d/%s/%s", num, str01, str02);
+    printf("------> res: %s\n", res);
+
+    // ------
+    long long int millis = host_time_millis();
+    long long int usec = host_time_usec();
+    long long int ms = usec / 1000LL;
+
+    printf("------> millis : %lld, usec: %lld, ms: %lld", millis, usec, ms);
+    
     return 0;
 }
