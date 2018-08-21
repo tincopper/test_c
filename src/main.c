@@ -1,27 +1,32 @@
 //
-// Created by tomgs on 18-8-13.
+// Created by tincopper on 18-8-21.
 //
-
 #include <stdio.h>
-#include "load_balance.h"
+#include <pthread.h>
 
-int main()
-{
-    int i = 0;
-    int weights[] = {4, 2, 1};
-    char *names[] = {"a", "b", "c"};
-    int size = sizeof(weights) / sizeof(int);
-
-    server *ss = initServers(names, weights, size);
-
-    printf("server is ");
-    for (i = 0; i < size; i++) {
-        printf("%s(%d) ", ss[i].name, ss[i].weight);
+void thread(void) {
+    int i;
+    for (i=0; i < 3; i++) {
+        printf("This is a pthread.\n");
     }
-    printf("\n");
+}
 
-    printf("\nwrr_nginx sequence is ");
-    wrr_nginx(ss, weights, size);
+int main() {
+
+    /**
+     * 多线程编程测试
+     */
+    pthread_t id;
+    int i, ret;
+    ret = pthread_create(&id, NULL, (void *) thread, NULL); // 成功返回0，错误返回错>误编号
+    if (ret != 0) {
+        printf("Create pthread error!\n");
+        exit(1);
+    }
+    for (i=0; i<3; i++)
+        printf("This is the main process.\n");
+
+    pthread_join(id, NULL);
 
     return 0;
 }
