@@ -14,6 +14,8 @@ typedef struct
 
 server *initServers(char **names, int *weights, int size);
 
+server *initDefaultServers(char **names, int size);
+
 int getNextServerIndex(server *ss, int size);
 
 void wrr_nginx(server *ss, int *weights, int size);

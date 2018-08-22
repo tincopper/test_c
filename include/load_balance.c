@@ -34,6 +34,26 @@ server *initServers(char **names, int *weights, int size)
     return ss;
 }
 
+/**
+ * init defualt servers, the weight is 50%
+ * @param names  server names
+ * @param size   server num
+ * @return
+ */
+server *initDefaultServers(char **names, int size)
+{
+    int i = 0;
+    server *ss = calloc(size+1, sizeof(server));
+
+    for (i = 0; i < size; i++)
+    {
+        ss[i].weight = 50;
+        memcpy(ss[i].name, names[i], 3);
+        ss[i].cur_weight = 0;
+    }
+    return ss;
+}
+
 int getNextServerIndex(server *ss, int size)
 {
     int i ;
