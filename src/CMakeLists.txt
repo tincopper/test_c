@@ -8,7 +8,9 @@ add_library(${INCLUDE_DIRECTORIES} host_info.h ../include/host_info.c)
 
 add_executable(test_c
         ../include/host_info.c
+        ../include/host_info.h
         ../include/cJSON.c
+        ../include/cJSON.h
         ../include/id_generator_util.c
         ../include/id_generator_util.h
         ../include/load_balance.c

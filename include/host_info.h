@@ -67,24 +67,6 @@ char *current_ipv6();
  */
 char *current_host_mac();
 
-static inline long long host_time_millis() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    /**
-     * int ：表示数据范围在-32768到32767之间
-     * long int : 表示的范围在-2147483648到2147483647之间
-     * long long : 表示的范围在-9223372036854775808 到 9223372036854775807之间
-     *
-     * 毫秒有13位超过了long int范围，所需要转为long long类型
-     */
-    long long t_sec = (long long)tv.tv_sec;
-    long long t_usec = (long long)tv.tv_usec;
-    return (t_sec * 1000000LL + t_usec) / 1000LL;
-}
+static inline long long host_time_millis();
 
-static inline long long host_time_usec()
-{
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-    return (long long) tv.tv_sec * MO_USEC_PER_SEC + (long long) tv.tv_usec;
-}
+static inline long long host_time_usec();

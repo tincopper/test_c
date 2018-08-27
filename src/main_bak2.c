@@ -156,7 +156,7 @@ int main() {
     cJSON_AddNumberToObject(instanceSpan, "rt", current_system_time_millis());
 
     cJSON *osInfo = cJSON_CreateObject();
-    cJSON_AddStringToObject(osInfo, "osName", current_host_name());
+    cJSON_AddStringToObject(osInfo, "osName", current_os_name());
     cJSON_AddStringToObject(osInfo, "hostname", current_host_name());
     cJSON_AddNumberToObject(osInfo, "processNo", current_thread_pid());
     //cJSON_AddItemToObject(osInfo, "ipv4s", cJSON_CreateStringArray(current_ipv4(), sizeof(currentIpv4) / sizeof(currentIpv4[0])));
