@@ -6,6 +6,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include "host_info.h"
+#include "http_util.h"
 
 int main()
 {
@@ -16,7 +17,12 @@ int main()
 
     //将json结构格式化到缓冲区
     char *bufJson = cJSON_Print(json);
-    printf("%s\n", bufJson);
+    printf("request body : \n%s\n\n", bufJson);
 
+    char *url = "http://10.40.6.114:12800/instance/heartbeat";
+    char resp[512];
+    post_request(url, bufJson, resp);
+
+    printf("response body:\n %s\n", resp);
     return 0;
 }

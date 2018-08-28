@@ -15,6 +15,8 @@ add_executable(test_c
         ../include/id_generator_util.h
         ../include/load_balance.c
         ../include/load_balance.h
+        ../include/http_util.c
+        ../include/http_util.h
         main.c)
 # m: lm
-target_link_libraries(test_c -lm -lpthread)
+target_link_libraries(test_c -lm -lpthread -lcurl)
