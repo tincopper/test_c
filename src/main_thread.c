@@ -32,16 +32,11 @@ void signal_handler(int m)
     printf("%d\n", count);
 }
 
-void thread(char *args) {
-//    int i;
-//    for (i=0; i < 3; i++) {
-//        printf("This is a pthread.\n");
-//    }
-
-    printf("This is a pthread.  %s\n", args);
-    signal(SIGALRM, signal_handler);  //注册当接收到SIGALRM时会发生是么函数；
-    set_timer();  //启动定时器
-    for (;;);  //阻塞，等待时间执行
+void thread() {
+    int i;
+    for (i=0; i < 3; i++) {
+        printf("This is a pthread.\n");
+    }
 }
 
 void thread1(struct args *arg) {

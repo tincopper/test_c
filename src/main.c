@@ -2,27 +2,20 @@
 // Created by root on 18-8-22.
 //
 #include <stdio.h>
-#include "cJSON.h"
 #include <time.h>
 #include <sys/time.h>
 #include "host_info.h"
-#include "http_util.h"
+
+int count = 0;
+void signal_handler(int signal)
+{
+    count ++;
+    printf("count : %d, %d\n", count, signal);
+}
 
 int main()
 {
-    cJSON *json = cJSON_CreateObject();
-    //添加一个数字
-    cJSON_AddNumberToObject(json, "ii", 5);
-    cJSON_AddNumberToObject(json, "ht", current_system_time_millis());
+    set_timer(1, signal_handler);
 
-    //将json结构格式化到缓冲区
-    char *bufJson = cJSON_Print(json);
-    printf("request body : \n%s\n\n", bufJson);
-
-    char *url = "http://10.40.6.114:12800/instance/heartbeat";
-    char resp[512];
-    post_request(url, bufJson, resp);
-
-    printf("response body:\n %s\n", resp);
-    return 0;
+    for (;;);
 }

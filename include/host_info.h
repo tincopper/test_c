@@ -70,3 +70,5 @@ char *current_host_mac();
 static inline long long host_time_millis();
 
 static inline long long host_time_usec();
+
+void set_timer(int sec_interval, void (*signal_handler)(int));

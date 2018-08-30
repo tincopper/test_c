@@ -17,7 +17,7 @@
 #include <sys/utsname.h>
 #include <ifaddrs.h>
 #include "host_info.h"
-
+#include <signal.h>
 
 LONG current_system_time_millis() {
     struct timeval tv;
@@ -193,4 +193,17 @@ static inline long long host_time_usec() {
     struct timeval tv;
     gettimeofday(&tv, 0);
     return (long long) tv.tv_sec * MO_USEC_PER_SEC + (long long) tv.tv_usec;
+}
+
+static struct itimerval oldtv;
+void set_timer(int sec_interval, void (*signal_handler)(int)) {
+
+    signal(SIGALRM, signal_handler);  //注册当接收到SIGALRM时会发生是么函数；
+
+    struct itimerval itv;
+    itv.it_interval.tv_sec = sec_interval;  //设置为sec_interval秒
+    itv.it_interval.tv_usec = 0;
+    itv.it_value.tv_sec = 1;
+    itv.it_value.tv_usec = 0;
+    setitimer(ITIMER_REAL, &itv, &oldtv);  //此函数为linux的api,不是c的标准库函数
 }
